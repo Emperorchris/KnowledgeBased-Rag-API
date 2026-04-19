@@ -1,0 +1,23 @@
+fastapi[standard]
+python-multipart
+ 
+# Database
+sqlalchemy
+pymysql
+ 
+# AI/LLM
+langchain
+langchain-chroma
+langchain-openai
+langchain-text-splitters
+openai
+tiktoken
+ 
+# Vector Store
+chromadb
+ 
+
+# Utilities
+python-dotenv
+pydantic
+aiofiles
