@@ -2,9 +2,9 @@
 APILog and DailyStatistics models for monitoring and analytics.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
-    Column, String, Integer, Text, DateTime, Float,
+    Column, String, Integer, Text, DateTime, Float, Uuid,
     Index, UniqueConstraint,
 )
 from sqlalchemy.orm import validates
@@ -25,7 +25,7 @@ class APILog(Base):
         Index("ix_api_logs_created_at", "created_at"),
     )
 
-    id = Column(String(50), primary_key=True, default=lambda: f"log_{uuid.uuid4().hex[:12]}")
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
 
     # Request Information
     endpoint = Column(String(255), nullable=False)
@@ -46,7 +46,7 @@ class APILog(Base):
     response_size_bytes = Column(Integer, nullable=True)
 
     # Timestamp
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     def __repr__(self):
         return f"<APILog endpoint={self.endpoint} status={self.status_code} time={self.response_time_ms}ms>"
@@ -75,7 +75,7 @@ class DailyStatistics(Base):
         UniqueConstraint("date", name="uq_daily_statistics_date"),
     )
 
-    id = Column(String(50), primary_key=True, default=lambda: f"stats_{uuid.uuid4().hex[:12]}")
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     date = Column(String(10), nullable=False, unique=True)
 
     # Counts
@@ -97,7 +97,7 @@ class DailyStatistics(Base):
     error_count = Column(Integer, default=0)
 
     # Timestamp
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     def __repr__(self):
         return f"<DailyStatistics date={self.date} messages={self.messages_sent} cost=${self.total_cost:.2f}>"

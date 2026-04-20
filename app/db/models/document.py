@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import (
     Column, String, Integer, Text, DateTime, Float, Boolean,
-    ForeignKey, Index, Enum, JSON,
+    ForeignKey, Index, Enum, JSON, Uuid,
 )
 from sqlalchemy.orm import relationship, validates
 import uuid
@@ -13,7 +13,7 @@ from .enums import DocumentSourceEnum
 class Document(Base):
     __tablename__ = "documents"
 
-    id = Column(uuid.UUID, primary_key=True, default=uuid.uuid4, unique=True, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     name = Column(String(255), nullable=False, index=True)
     description = Column(Text, nullable=True)
     file_type = Column(String(10), nullable=False)
@@ -25,15 +25,15 @@ class Document(Base):
         nullable=False,
     )
     tags = Column(JSON, nullable=True, default=list)
-    metadata = Column(JSON, nullable=True, default=dict)
+    extra_metadata = Column(JSON, nullable=True, default=dict)
     author = Column(String(255), nullable=True)
     chunks = Column(Integer, default=0)
     tokens = Column(Integer, default=0)
     chunk_ids = Column(JSON, nullable=True, default=list)
     is_processed = Column(Boolean, default=False)
     relevance_score = Column(Float, nullable=True)
-    created_at = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     messages = relationship(
         "Message",
@@ -97,9 +97,9 @@ class DocumentChunk(Base):
         Index("ix_document_chunks_vector_id", "vector_id"),
     )
 
-    id = Column(uuid.UUID, primary_key=True, default=uuid.uuid4, unique=True, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     document_id = Column(
-        uuid.UUID,
+        Uuid,
         ForeignKey("documents.id", ondelete="CASCADE"),
         nullable=False,
     )
@@ -107,7 +107,7 @@ class DocumentChunk(Base):
     content = Column(Text, nullable=False)
     tokens = Column(Integer, default=0)
     vector_id = Column(String(255), nullable=True, unique=True)
-    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     document = relationship("Document", back_populates="chunks_rel")
 

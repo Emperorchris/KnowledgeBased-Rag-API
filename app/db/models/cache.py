@@ -2,7 +2,7 @@
 EmbeddingCache model for avoiding redundant embedding API calls.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Column, String, Integer, DateTime, JSON,
     Index, UniqueConstraint,
@@ -29,8 +29,8 @@ class EmbeddingCache(Base):
     embedding = Column(JSON, nullable=False)
     embedding_model = Column(String(50), default="text-embedding-3-small")
     hit_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    last_accessed_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    last_accessed_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<EmbeddingCache hash={self.text_hash[:8]} hits={self.hit_count}>"

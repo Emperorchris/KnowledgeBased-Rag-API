@@ -9,8 +9,9 @@ from .base import Base
 from .enums import DocumentSourceEnum, MessageRoleEnum
 from .document import Document, DocumentChunk
 from .chat import ChatSession, Message
-from .logging import APILog, DailyStatistics
+from .api_logs import APILog, DailyStatistics
 from .cache import EmbeddingCache
+from .user import User
 
 # Register event listeners
 from . import events  # noqa: F401
@@ -26,4 +27,5 @@ __all__ = [
     "APILog",
     "DailyStatistics",
     "EmbeddingCache",
+    "User",
 ]

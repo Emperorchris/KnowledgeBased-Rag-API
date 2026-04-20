@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Column, String, Integer, Text, DateTime, Float, Boolean,
-    ForeignKey, Index, Enum as SQLEnum, JSON,
+    ForeignKey, Index, Enum as SQLEnum, JSON, Uuid,
 )
 from sqlalchemy.orm import relationship, validates
 import uuid
@@ -17,18 +17,18 @@ class ChatSession(Base):
         Index("ix_chat_sessions_created_at", "created_at"),
     )
 
-    id = Column(String(50), primary_key=True, default=lambda: f"sess_{uuid.uuid4().hex[:12]}")
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     name = Column(String(255), nullable=False, index=True)
     description = Column(Text, nullable=True)
-    user_id = Column(String(100), nullable=True, index=True)
+    user_id = Column(Uuid, nullable=True)
     document_ids = Column(JSON, nullable=True, default=list)
     total_messages = Column(Integer, default=0)
     total_tokens = Column(Integer, default=0)
     total_cost = Column(Float, default=0.0)
     is_active = Column(Boolean, default=True)
     archived_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     messages = relationship(
         "Message",
@@ -67,6 +67,7 @@ class ChatSession(Base):
             "total_tokens": self.total_tokens,
             "total_cost": round(self.total_cost, 4),
             "is_active": self.is_active,
+            "is_archived": self.is_archived,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
@@ -80,14 +81,14 @@ class Message(Base):
         Index("ix_messages_created_at", "created_at"),
     )
 
-    id = Column(String(50), primary_key=True, default=lambda: f"msg_{uuid.uuid4().hex[:12]}")
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     session_id = Column(
-        String(50),
+        Uuid,
         ForeignKey("chat_sessions.id", ondelete="CASCADE"),
         nullable=False,
     )
     document_id = Column(
-        String(50),
+        Uuid,
         ForeignKey("documents.id", ondelete="SET NULL"),
         nullable=True,
     )
@@ -101,7 +102,7 @@ class Message(Base):
     estimated_cost = Column(Float, default=0.0)
     user_rating = Column(Integer, nullable=True)
     feedback = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     session = relationship("ChatSession", back_populates="messages")
     document = relationship("Document", back_populates="messages")
