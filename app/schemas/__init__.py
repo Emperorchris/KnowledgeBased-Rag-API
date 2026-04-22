@@ -1,6 +1,6 @@
 from .chat import ChatCreate, ChatResponse, MessageCreate, MessageResponse
 from .document import DocumentCreate, DocumentResponse, DocumentUpdate, DocumentDetailResponse, DocumentChunkResponse
-from .user import UserCreate, UserResponse
+from .user import UserCreate, UserResponse, UserUpdate, UserLogin, RefreshTokenRequest, AuthResponse
 
 __all__ = [
     "ChatCreate",
@@ -14,4 +14,8 @@ __all__ = [
     "DocumentChunkResponse",
     "UserCreate",
     "UserResponse",
+    "UserUpdate",
+    "UserLogin",
+    "RefreshTokenRequest",
+    "AuthResponse",
 ]

@@ -21,3 +21,10 @@ chromadb
 python-dotenv
 pydantic
 aiofiles
+
+# security
+pyjwt
+pwdlib[argon2]
+
+# Unstructured data processing
+unstructured[all-docs]

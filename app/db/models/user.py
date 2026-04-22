@@ -35,6 +35,8 @@ class User(Base):
             raise ValueError("Email must be <= 255 characters")
         try:
             validate_email(value)
-        except EmailNotValidError as e:
-            raise ValueError(f"Invalid email format: {e}")
+        except EmailNotValidError:
+            raise ValueError("Please provide a valid email address")
         return value
+
+    

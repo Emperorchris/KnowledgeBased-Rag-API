@@ -15,6 +15,7 @@ class Document(Base):
 
     id = Column(Uuid, primary_key=True, default=uuid.uuid4, unique=True, index=True)
     name = Column(String(255), nullable=False, index=True)
+    file_location = Column(String(500), nullable=True)
     description = Column(Text, nullable=True)
     file_type = Column(String(10), nullable=False)
     size_bytes = Column(Integer, nullable=False)

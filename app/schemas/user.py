@@ -26,3 +26,19 @@ class UserResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+
+class AuthResponse(BaseModel):
+    user: UserResponse
+    access_token: str
+    refresh_token: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str

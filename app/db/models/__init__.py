@@ -12,6 +12,7 @@ from .chat import ChatSession, Message
 from .api_logs import APILog, DailyStatistics
 from .cache import EmbeddingCache
 from .user import User
+from .refresh_token import RefreshToken
 
 # Register event listeners
 from . import events  # noqa: F401
@@ -28,4 +29,5 @@ __all__ = [
     "DailyStatistics",
     "EmbeddingCache",
     "User",
+    "RefreshToken",
 ]
