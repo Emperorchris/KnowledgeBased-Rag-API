@@ -86,6 +86,9 @@ class Document(Base):
             "chunks": self.chunks,
             "tokens": self.tokens,
             "author": self.author,
+            "is_processed": self.is_processed,
+            "relevance_score": self.relevance_score,
+            "tags": self.tags,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

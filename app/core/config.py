@@ -16,10 +16,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-LARGE_LANGUAGE_MODEL = os.getenv("LARGE_LANGUAGE_MODEL", "gpt-4o")
+LARGE_LANGUAGE_MODEL = os.getenv("LARGE_LANGUAGE_MODEL", "gpt-5.4-nano")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4096"))
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CHROMA_PERSISTENCE_DIR = os.getenv("CHROMA_PERSISTENCE_DIR", os.path.join(BASE_DIR, "chroma_db"))
 
 API_RATE_LIMIT_PER_MINUTE = int(os.getenv("API_RATE_LIMIT_PER_MINUTE", "60"))
 

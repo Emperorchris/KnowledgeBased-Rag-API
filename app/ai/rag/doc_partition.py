@@ -42,7 +42,7 @@ def partition_document(file_bytes: bytes, filename: str) -> dict:
         elif isinstance(el, Image):
             images.append({
                 "content": str(el),
-                "image_path": el.metadata.image_path if hasattr(el.metadata, "image_path") else None,
+                "image_base64": el.metadata.image_base64 if hasattr(el.metadata, "image_base64") else None,
                 "page": el.metadata.page_number,
             })
         else:
@@ -52,6 +52,7 @@ def partition_document(file_bytes: bytes, filename: str) -> dict:
 
     return {
         "text": full_text,
+        "elements": elements,
         "tables": tables,
         "images": images,
         "element_count": len(elements),
