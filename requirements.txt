@@ -28,3 +28,5 @@ pwdlib[argon2]
 
 # Unstructured data processing
 unstructured[all-docs]
+
+alembic

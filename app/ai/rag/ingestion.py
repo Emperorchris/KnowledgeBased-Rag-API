@@ -19,8 +19,10 @@ def ingestion_pipeline(file_bytes: bytes, filename: str, document_id: str, tags:
     print("Ingesting document...")
     file_type = filename.rsplit(".", 1)[-1].lower()
 
+    print("Partitioning document...")
     partitioned = partition_document(file_bytes, filename)
 
+    print("Enriching document content...")
     enriched = enrich_partitioned_document(partitioned)
 
     print("Chunking document...")
@@ -41,7 +43,7 @@ def ingestion_pipeline(file_bytes: bytes, filename: str, document_id: str, tags:
     for i, chunk in enumerate(chunks):
         chunk.metadata["chunk_index"] = i
 
-
+    print("Storing document chunks in vector store...")
     ids = [f"{document_id}_chunk_{i}" for i in range(len(chunks))]
     vector_store.add_documents(chunks, ids=ids)
 

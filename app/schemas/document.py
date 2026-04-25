@@ -31,6 +31,9 @@ class DocumentResponse(BaseModel):
     author: str | None
     chunks: int
     tokens: int
+    total_tables: int
+    total_images: int
+    chunk_ids: list[str] | None
     is_processed: bool
     created_at: datetime
     updated_at: datetime

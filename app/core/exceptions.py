@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+import traceback
 
 
 # Custom exceptions
@@ -78,14 +79,29 @@ def register_exception_handlers(app: FastAPI):
 
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
+        tb = traceback.format_exc()
+        print(f"HTTP error: {exc.status_code} - {exc.detail}\n{tb}")
+        if hasattr(exc, "to_dict"):
+            content = exc.to_dict()
+        else:
+            content = {
+                "message": exc.detail,
+                "error_detail": {
+                    "status_code": exc.status_code,
+                    "error_type": type(exc).__name__,
+                    "method": request.method,
+                    "url": str(request.url),
+                    "content_type": request.headers.get("content-type", "unknown"),
+                    "hint": "If uploading files, use multipart/form-data, not application/json",
+                },
+            }
         return JSONResponse(
             status_code=exc.status_code,
-            content=exc.to_dict() if hasattr(exc, "to_dict") else {"message": exc.detail},
+            content=content,
         )
 
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
-        import traceback
         tb = traceback.format_exc()
         print(f"Unhandled error: {type(exc).__name__}: {exc}\n{tb}")
         return JSONResponse(

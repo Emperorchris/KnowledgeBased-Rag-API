@@ -19,7 +19,7 @@ class Document(Base):
     description = Column(Text, nullable=True)
     file_type = Column(String(10), nullable=False)
     size_bytes = Column(Integer, nullable=False)
-    content = Column(Text, nullable=False)
+    content = Column(Text, nullable=True)
     source = Column(
         Enum(DocumentSourceEnum, native_enum=False),
         default=DocumentSourceEnum.UPLOADED,
@@ -30,6 +30,8 @@ class Document(Base):
     author = Column(String(255), nullable=True)
     chunks = Column(Integer, default=0)
     tokens = Column(Integer, default=0)
+    total_tables = Column(Integer, default=0)
+    total_images = Column(Integer, default=0)
     chunk_ids = Column(JSON, nullable=True, default=list)
     is_processed = Column(Boolean, default=False)
     relevance_score = Column(Float, nullable=True)
@@ -58,7 +60,7 @@ class Document(Base):
 
     @validates("file_type")
     def validate_file_type(self, key, value):
-        allowed = ["txt", "pdf", "md", "docx", "html", "json"]
+        allowed = [".txt", ".pdf", ".md", ".docx", ".html", ".json"]
         if value.lower() not in allowed:
             raise ValueError(f"File type must be one of: {allowed}")
         return value.lower()
@@ -91,6 +93,8 @@ class Document(Base):
             "tags": self.tags,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
+            "total_tables": self.total_tables,
+            "total_images": self.total_images,
         }
 
 
