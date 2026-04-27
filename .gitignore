@@ -20,3 +20,6 @@ wheels/
 # Logs
 logs/
 *.log
+
+# upload files
+uploaded_doc_files/
