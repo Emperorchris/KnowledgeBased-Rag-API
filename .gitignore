@@ -23,3 +23,6 @@ logs/
 
 # upload files
 uploaded_doc_files/
+
+# db
+chroma_db/
