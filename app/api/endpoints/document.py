@@ -16,7 +16,7 @@ from ...core.config import UPLOADED_FILES_DIR
 document_router = APIRouter(
     prefix="/documents",
     tags=["documents"],
-    dependencies=[Depends(get_current_user)]
+    # dependencies=[Depends(get_current_user)]
 )
 
 
