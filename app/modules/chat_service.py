@@ -91,8 +91,7 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
         content=question,
     )
     db.add(user_msg)
-    db.commit()
-    db.refresh(user_msg)
+    db.flush()
 
     # Get chat history (last 10 messages for context)
     history = (
@@ -214,7 +213,7 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
                 f"4. If asked who you are, introduce yourself as {AI_NAME} and mention your creator.\n"
                 "5. If asked something outside the provided context, respond: "
                 "'I don't have enough information in my knowledge base to answer that. "
-                f"You can contact {COMPANY_EMAIL} or visit {COMPANY_WEBSITE} for further assistance.'\n"
+                f"You can contact {COMPANY_EMAIL} for further assistance.'\n"
                 "6. Structure longer answers with bullet points or numbered lists for clarity.\n"
                 "7. If a question is ambiguous, address the most likely interpretation and note the ambiguity.\n"
                 "8. Be concise but thorough — include all relevant details without unnecessary filler.\n"
