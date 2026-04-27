@@ -70,3 +70,31 @@ def query_knowledge_base(query: str, k: int = 5, filter: dict = None) -> dict:
         "chunks_used": len(chunks),
         "relevance_scores": {chunk["metadata"].get("document_id", f"chunk_{i}"): chunk["score"] for i, chunk in enumerate(chunks)},
     }
+
+
+def generate_chat_title(question: str, answer: str) -> str:
+    prompt = (
+        "Generate a very short, concise, and descriptive title for a chat session based on the following question and answer.\n\n"
+        f"Question: {question}\n"
+        f"Answer: {answer}\n\n"
+        "Title:"
+    )
+    response = llm.invoke([{"role": "user", "content": prompt}])
+    return response.content.strip().strip('"')
+
+
+def generate_chat_description(question: str, answer: str) -> str:
+    prompt = (
+        "Generate a concise and informative description for a chat session based on the following question and answer. Make it short and to the point.\n\n"
+        f"Question: {question}\n"
+        f"Answer: {answer}\n\n"
+        "Description:"
+    )
+    response = llm.invoke([{"role": "user", "content": prompt}])
+    return response.content.strip().strip('"')
+
+
+
+def calc_relevance_score(similarity_score: float) -> float:
+    # Convert cosine similarity (-1 to 1) to a relevance score (0 to 100)
+    return max(0, min(100, (similarity_score + 1) / 2 * 100))

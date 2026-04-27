@@ -92,7 +92,7 @@ class Message(Base):
         ForeignKey("documents.id", ondelete="SET NULL"),
         nullable=True,
     )
-    role = Column(SQLEnum(MessageRoleEnum, native_enum=False), nullable=False)
+    role = Column(SQLEnum(MessageRoleEnum, native_enum=False), nullable=False, default=MessageRoleEnum.USER.value)
     content = Column(Text, nullable=False)
     document_ids_used = Column(JSON, nullable=True, default=list)
     relevance_scores = Column(JSON, nullable=True, default=dict)
@@ -149,3 +149,5 @@ class Message(Base):
             "user_rating": self.user_rating,
             "created_at": self.created_at.isoformat(),
         }
+
+

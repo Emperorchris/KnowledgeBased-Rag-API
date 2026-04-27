@@ -21,6 +21,10 @@ MAX_TOKENS = int(os.getenv("MAX_TOKENS", "4096"))
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
 
+INPUT_COST_PER_MILLION = float(os.getenv("INPUT_COST_PER_MILLION", 2.50))
+OUTPUT_COST_PER_MILLION = float(os.getenv("OUTPUT_COST_PER_MILLION", 10.00))
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 UPLOADED_FILES_DIR = os.getenv("UPLOADED_FILES_DIR", os.path.join(BASE_DIR, "uploaded_doc_files"))
 CHROMA_PERSISTENCE_DIR = os.getenv("CHROMA_PERSISTENCE_DIR", os.path.join(BASE_DIR, "chroma_db"))
