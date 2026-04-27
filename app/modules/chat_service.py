@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from ..db.models.enums import MessageRoleEnum
 from ..db.models import ChatSession, Message, DocumentChunk, Document
-from ..core.exceptions import NotFoundException
+from ..core.exceptions import NotFoundException, BadRequestException
 from ..ai.rag.retrieval import (
     retrieve_relevant_chunks,
     build_context,
@@ -31,8 +31,12 @@ def create_session(db: Session, name: str, user_id: str = None, document_ids: li
 
 
 def get_session(db: Session, session_id: str) -> ChatSession:
-    session = db.query(ChatSession).filter(
-        ChatSession.id == UUID(session_id)).first()
+    try:
+        valid_id = UUID(session_id)
+    except ValueError:
+        raise BadRequestException(
+            "Invalid session", error_detail="Invalid session ID format")
+    session = db.query(ChatSession).filter(ChatSession.id == valid_id).first()
     if not session:
         raise NotFoundException("Chat session not found")
     return session
@@ -41,23 +45,38 @@ def get_session(db: Session, session_id: str) -> ChatSession:
 def list_user_chat_sessions(db: Session, user_id: str = None, limit: int = 100) -> list[ChatSession]:
     query = db.query(ChatSession).order_by(ChatSession.created_at.desc())
     if user_id:
-        query = query.filter(ChatSession.user_id == user_id)
-    return query.limit(limit).all()
+        try:
+            valid_user_id = UUID(user_id)
+        except ValueError:
+            raise BadRequestException(
+                "Invalid user ID format", error_detail={"user_id": user_id})
+        query = query.filter(ChatSession.user_id == valid_user_id)
+    result = query.limit(limit).all()
+    if result is None or len(result) == 0:
+        raise NotFoundException("No chat sessions found for the user")
+    return result
 
 
 def list_all_chat_sessions(db: Session, limit: int = 100) -> list[ChatSession]:
-    return db.query(ChatSession).order_by(ChatSession.created_at.desc()).limit(limit).all()
+    result = db.query(ChatSession).order_by(ChatSession.created_at.desc()).limit(limit).all()
+    if result is None or len(result) == 0:
+        raise NotFoundException("No chat sessions found")
+    return result
 
 
 def get_chat_history(db: Session, session_id: str, limit: int = 100) -> list[Message]:
     session = get_session(db, session_id)
-    return (
+    result = (
         db.query(Message)
         .filter(Message.session_id == session.id)
         .order_by(Message.created_at.asc())
         .limit(limit)
         .all()
     )
+    if result is None or len(result) == 0:
+        raise NotFoundException("No chat history found for the session")
+    return result
+    
 
 
 def send_message(db: Session, session_id: str | None, question: str) -> dict:
@@ -92,7 +111,6 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
     if session.document_ids:
         search_filter = {"document_id": {
             "$in": [str(d) for d in session.document_ids]}}
-
 
     search_query = question
     if history:

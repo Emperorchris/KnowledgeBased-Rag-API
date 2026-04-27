@@ -34,7 +34,7 @@ API_RATE_LIMIT_PER_MINUTE = int(os.getenv("API_RATE_LIMIT_PER_MINUTE", "60"))
 # if not all([MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, OPENAI_API_KEY]):
 #     raise Exception("Missing environment variables")
 
-required_vars = ["MYSQL_HOST", "MYSQL_PORT", "MYSQL_USER", "MYSQL_PASSWORD", "MYSQL_DATABASE", "OPENAI_API_KEY"]
+required_vars = ["MYSQL_HOST", "MYSQL_PORT", "MYSQL_USER", "MYSQL_DATABASE", "OPENAI_API_KEY"]
 missing = [var for var in required_vars if not os.getenv(var)]
 if missing:
     raise Exception(f"Missing environment variables: {', '.join(missing)}")
