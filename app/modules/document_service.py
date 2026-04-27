@@ -5,7 +5,7 @@ from ..db.models import DocumentSourceEnum
 
 from ..db.models import Document, DocumentChunk
 from ..schemas.document import DocumentCreate, DocumentResponse, DocumentChunkResponse
-from ..core.exceptions import BadRequestException
+from ..core.exceptions import BadRequestException, NotFoundException
 from sqlalchemy.orm import Session
 from ..ai.rag.ingestion import ingestion_pipeline
 from fastapi import UploadFile
@@ -42,7 +42,34 @@ def proces_doc_file(file: UploadFile) -> dict:
         "file_path": str(file_path),
         "file_relative_path": f"{upload_dir.name}/{unique_filename}",
     }
-    
+
+
+def get_all_uploaded_documents(db: Session, base_url: str, limit: int = 100):
+    result = db.query(Document).filter(
+        Document.source == DocumentSourceEnum.UPLOADED
+    ).order_by(Document.created_at.desc()).limit(limit).all()
+    if not result:
+        raise NotFoundException("No uploaded documents found")
+
+    documents = []
+    for doc in result:
+        doc_dict = DocumentResponse.model_validate(doc).model_dump()
+        doc_dict["download_url"] = f"{base_url}api/v1/documents/{doc.id}/download"
+        documents.append(doc_dict)
+    return documents
+
+
+def get_document_by_id(db: Session, document_id: str, base_url: str):
+    try:
+        valid_id = uuid.UUID(document_id)
+    except ValueError:
+        raise BadRequestException("Invalid document ID format")
+    doc = db.query(Document).filter(Document.id == valid_id).first()
+    if not doc:
+        raise NotFoundException("Document not found")
+    doc_dict = DocumentResponse.model_validate(doc).model_dump()
+    doc_dict["download_url"] = f"{base_url}api/v1/documents/{doc.id}/download"
+    return doc_dict
     
     
 def create_document(db: Session, payload: DocumentCreate, file: UploadFile) -> DocumentResponse:
@@ -103,3 +130,24 @@ def store_document_chunk(db: Session, document_chunk: DocumentChunk) -> Document
     db.refresh(new_chunk)
     return DocumentChunkResponse.model_validate(new_chunk)
     
+    
+def delete_document(db: Session, document_id: str):
+    try:
+        valid_id = uuid.UUID(document_id)
+    except ValueError:
+        raise BadRequestException("Invalid document ID format")
+    doc = db.query(Document).filter(Document.id == valid_id).first()
+    if not doc:
+        raise NotFoundException("Document not found")
+    
+    # Delete associated chunks
+    db.query(DocumentChunk).filter(DocumentChunk.document_id == doc.id).delete()
+    
+    # Delete the document record
+    db.delete(doc)
+    db.commit()
+    
+    # Optionally delete the file from disk
+    file_path = Path(UPLOADED_FILES_DIR).parent / doc.file_location
+    if file_path.exists():
+        file_path.unlink()

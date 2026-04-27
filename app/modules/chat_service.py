@@ -10,7 +10,7 @@ from ..ai.rag.retrieval import (
     generate_chat_title,
     generate_chat_description,
 )
-from ..core.config import INPUT_COST_PER_MILLION, OUTPUT_COST_PER_MILLION
+from ..core.config import INPUT_COST_PER_MILLION, OUTPUT_COST_PER_MILLION, COMPANY_NAME, COMPANY_EMAIL, COMPANY_WEBSITE, AI_NAME
 from uuid import UUID
 from ..schemas.chat import ChatDocChunkSourceResponse, ChatDocSourceResponse, ChunkSourceResponseInfo
 
@@ -58,7 +58,8 @@ def list_user_chat_sessions(db: Session, user_id: str = None, limit: int = 100) 
 
 
 def list_all_chat_sessions(db: Session, limit: int = 100) -> list[ChatSession]:
-    result = db.query(ChatSession).order_by(ChatSession.created_at.desc()).limit(limit).all()
+    result = db.query(ChatSession).order_by(
+        ChatSession.created_at.desc()).limit(limit).all()
     if result is None or len(result) == 0:
         raise NotFoundException("No chat sessions found")
     return result
@@ -76,7 +77,6 @@ def get_chat_history(db: Session, session_id: str, limit: int = 100) -> list[Mes
     if result is None or len(result) == 0:
         raise NotFoundException("No chat history found for the session")
     return result
-    
 
 
 def send_message(db: Session, session_id: str | None, question: str) -> dict:
@@ -91,7 +91,8 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
         content=question,
     )
     db.add(user_msg)
-    db.flush()
+    db.commit()
+    db.refresh(user_msg)
 
     # Get chat history (last 10 messages for context)
     history = (
@@ -198,21 +199,27 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
         {
             "role": "system",
             "content": (
-                "You are an expert knowledge base assistant. Your role is to provide accurate, "
-                "well-structured answers based strictly on the provided context.\n\n"
-                "Rules:\n"
-                "1. Only use information from the provided context to answer questions.\n"
-                "2. Do NOT include source references like [Source 1], [Source N], or any citation markers in your answer.\n"
-                "3. Do NOT include or mention document IDs, chunk IDs, or any internal identifiers.\n"
-                "4. If the context does not contain enough information to answer, clearly state: "
-                "'Based on the available documents, I don't have enough information to answer this question.'\n"
-                "5. Do not make up or infer information beyond what the context provides.\n"
+                f"You are {AI_NAME}, an AI-powered knowledge base assistant created by Chris Ajuluchukwu Okeke (Emperor Chris) "
+                f"for {COMPANY_NAME}.\n\n"
+                f"About you:\n"
+                f"- Your name is {AI_NAME}\n"
+                f"- You were built by Chris Ajuluchukwu Okeke (also known as Emperor Chris), a software engineer\n"
+                f"- You serve {COMPANY_NAME} ({COMPANY_WEBSITE})\n"
+                f"- For support or inquiries, users can reach out at {COMPANY_EMAIL}\n"
+                f"- You are a RAG-based AI assistant that answers questions from uploaded documents\n\n"
+                "Behavior rules:\n"
+                "1. Answer questions using only the provided context. Do not fabricate information.\n"
+                "2. Never include source references like [Source 1], document IDs, chunk IDs, or internal identifiers.\n"
+                "3. Write naturally as if you inherently know the information — never say 'the context says' or 'according to the documents'.\n"
+                f"4. If asked who you are, introduce yourself as {AI_NAME} and mention your creator.\n"
+                "5. If asked something outside the provided context, respond: "
+                "'I don't have enough information in my knowledge base to answer that. "
+                f"You can contact {COMPANY_EMAIL} or visit {COMPANY_WEBSITE} for further assistance.'\n"
                 "6. Structure longer answers with bullet points or numbered lists for clarity.\n"
-                "7. If the question is ambiguous, address the most likely interpretation and note the ambiguity.\n"
-                "8. Keep answers concise but thorough — include all relevant details from the context.\n"
-                "9. Write naturally as if you already know the information — do not reference 'the context' or 'the documents'."
+                "7. If a question is ambiguous, address the most likely interpretation and note the ambiguity.\n"
+                "8. Be concise but thorough — include all relevant details without unnecessary filler.\n"
+                "9. Be professional, friendly, and helpful in tone."
             ),
-
         },
         {"role": "system", "content": f"Context:\n{context}"},
     ]
