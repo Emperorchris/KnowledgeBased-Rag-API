@@ -1,10 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, Request, Depends
 from fastapi.responses import FileResponse
-from ...modules.document_service import (
-    create_document,
-    get_all_uploaded_documents,
-    get_document_by_id,
-)
+from ...modules import document_service
 from ...core.dependencies import DB, get_current_user
 from ...core.exceptions import NotFoundException
 from ...schemas.document import DocumentCreate, DocumentResponse
@@ -37,17 +33,17 @@ def upload_document(
         author=author,
         tags=tags.split(",") if tags else [],
     )
-    return create_document(db, payload, file)
+    return document_service.create_document(db, payload, file)
 
 
 @document_router.get("/")
 def list_documents(db: DB, request: Request, limit: int = 100):
-    return get_all_uploaded_documents(db, str(request.base_url), limit)
+    return document_service.get_all_uploaded_documents(db, str(request.base_url), limit)
 
 
 @document_router.get("/{document_id}")
 def get_document(document_id: str, db: DB, request: Request):
-    return get_document_by_id(db, document_id, str(request.base_url))
+    return document_service.get_document_by_id(db, document_id, str(request.base_url))
 
 
 @document_router.get("/{document_id}/download")
@@ -67,5 +63,5 @@ def download_document(document_id: str, db: DB):
 
 @document_router.delete("/{document_id}")
 def delete_document(document_id: str, db: DB):
-    delete_document(db, document_id)
+    document_service.delete_document(db, document_id)
     return {"message": "Document deleted successfully"}
