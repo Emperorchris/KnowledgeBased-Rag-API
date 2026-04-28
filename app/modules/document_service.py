@@ -8,6 +8,7 @@ from ..schemas.document import DocumentCreate, DocumentResponse, DocumentChunkRe
 from ..core.exceptions import BadRequestException, NotFoundException
 from sqlalchemy.orm import Session
 from ..ai.rag.ingestion import ingestion_pipeline
+from ..ai.rag.vector_store import vector_store
 from fastapi import UploadFile
 from ..core.config import UPLOADED_FILES_DIR
 import uuid
@@ -140,14 +141,17 @@ def delete_document(db: Session, document_id: str):
     if not doc:
         raise NotFoundException("Document not found")
     
-    # Delete associated chunks
+    # Delete from vector store (ChromaDB)
+    vector_store.delete(where={"document_id": str(doc.id)})
+
+    # Delete associated chunks from MySQL
     db.query(DocumentChunk).filter(DocumentChunk.document_id == doc.id).delete()
-    
+
     # Delete the document record
     db.delete(doc)
     db.commit()
-    
-    # Optionally delete the file from disk
+
+    # Delete the file from disk
     file_path = Path(UPLOADED_FILES_DIR).parent / doc.file_location
     if file_path.exists():
         file_path.unlink()
