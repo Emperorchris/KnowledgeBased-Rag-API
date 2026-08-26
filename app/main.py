@@ -6,7 +6,7 @@ from app.db.database import engine
 from app.db.models.base import Base
 
 # Create all tables
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="AI Knowledge Base API",
