@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libxext6 \
     libxrender1 \
+    libx11-6 \
+    libice6 \
+    libfontconfig1 \
+    libfreetype6 \
     poppler-utils \
     tesseract-ocr \
     libmagic1 \
@@ -23,4 +27,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
