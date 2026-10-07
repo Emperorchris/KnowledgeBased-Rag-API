@@ -31,9 +31,9 @@ CHROMA_PERSISTENCE_DIR = os.getenv("CHROMA_PERSISTENCE_DIR", os.path.join(BASE_D
 
 API_RATE_LIMIT_PER_MINUTE = int(os.getenv("API_RATE_LIMIT_PER_MINUTE", "60"))
 
-COMPANY_NAME = os.getenv("COMPANY_NAME", "Sonichoice Logistics Serivices")
-COMPANY_EMAIL = os.getenv("SUPPORT_EMAIL", "info@sonichoicelogistics.com")
-COMPANY_WEBSITE = os.getenv("COMPANY_WEBSITE", "https://www.inventory.sonichoicelogistics.com")
+COMPANY_NAME = os.getenv("COMPANY_NAME", "Nigeria Defense Academy")
+COMPANY_EMAIL = os.getenv("SUPPORT_EMAIL", "info@nda.edu.ng")
+COMPANY_WEBSITE = os.getenv("COMPANY_WEBSITE", "https://www.nda.edu.ng")
 
 AI_NAME = os.getenv("AI_NAME", "SonicAI")
 AI_DESCRIPTION = os.getenv("AI_DESCRIPTION", f"{AI_NAME} is a powerful knowledge-based assistant designed to help you quickly find answers and insights from {COMPANY_NAME}.")

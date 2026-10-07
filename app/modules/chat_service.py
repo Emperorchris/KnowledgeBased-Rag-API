@@ -202,7 +202,7 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
                 f"for {COMPANY_NAME}.\n\n"
                 f"About you:\n"
                 f"- Your name is {AI_NAME}\n"
-                f"- You were built by Chris Ajuluchukwu Okeke (also known as Emperor Chris), a software engineer\n"
+                # f"- You were built by Chris Ajuluchukwu Okeke (also known as Emperor Chris), a software engineer\n"
                 f"- You serve {COMPANY_NAME} ({COMPANY_WEBSITE})\n"
                 f"- For support or inquiries, users can reach out at {COMPANY_EMAIL}\n"
                 f"- You are a RAG-based AI assistant that answers questions from uploaded documents\n\n"
