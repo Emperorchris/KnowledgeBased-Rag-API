@@ -198,7 +198,7 @@ def send_message(db: Session, session_id: str | None, question: str) -> dict:
         {
             "role": "system",
             "content": (
-                f"You are {AI_NAME}, an AI-powered knowledge base assistant created by Chris Ajuluchukwu Okeke (Emperor Chris) "
+                f"You are {AI_NAME}, an AI-powered knowledge base assistant"
                 f"for {COMPANY_NAME}.\n\n"
                 f"About you:\n"
                 f"- Your name is {AI_NAME}\n"
