@@ -1,32 +1,31 @@
-fastapi[standard]
+fastapi[standard]>=0.128,<0.129
 python-multipart
- 
+
 # Database
-sqlalchemy
-pymysql
- 
+SQLAlchemy>=2.0.30,<2.1
+pymysql>=1.2,<1.3
+
 # AI/LLM
-langchain
-langchain-chroma
-langchain-openai
-langchain-text-splitters
-openai
-tiktoken
- 
+langchain>=0.3,<0.4
+langchain-chroma>=0.2,<0.3
+langchain-openai>=0.3,<0.4
+langchain-text-splitters>=0.3,<0.4
+openai>=2.48,<2.49
+tiktoken>=0.14,<0.15
+
 # Vector Store
-chromadb
- 
+chromadb>=1.5,<1.6
 
 # Utilities
-python-dotenv
-pydantic
-aiofiles
+python-dotenv>=1.2,<1.3
+pydantic>=2.13,<2.14
+aiofiles>=25.1,<25.2
 
 # security
-pyjwt
+pyjwt>=2.15,<2.16
 pwdlib[argon2]
 
 # Unstructured data processing
 unstructured[all-docs]
 
-alembic
+alembic>=1.16,<1.17
